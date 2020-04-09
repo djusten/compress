@@ -10,6 +10,7 @@ add_compile_options (-Wall -Werror -O3)
 ################################# Source files #################################
 
 add_executable(compress_service
+  ./src/bit_stream.c
   ./src/compress.c
   ./src/filter.c
   ./src/main.c

@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "filter.h"
+#include "bit_stream.h"
 
 void printPixels(const uint8_t *pixels, int size)
 {
@@ -74,7 +75,18 @@ uint8_t *Compress(const uint8_t *pixels, uint_fast16_t width, uint_fast16_t heig
       free(validPixels);
       return NULL;
     }
-    printf("Elem %x %dx\n", *pValidPixels, numSamePixel);
+
+    //Debug
+    //printf("Pixel: %x Samples: %dx\n", *pValidPixels, numSamePixel);
+
+    uint8_t bitsUsed;
+    uint32_t bitStream;
+
+    BitStreamConvert(*pValidPixels, numSamePixel, &bitStream, &bitsUsed);
+
+    //Debug Only
+    BitStreamPrint(bitStream, bitsUsed);
+
     pValidPixels += numSamePixel;
     remainingPixels -= numSamePixel;
   }
