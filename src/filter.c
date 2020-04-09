@@ -22,7 +22,7 @@ uint8_t *Filter(const uint8_t *pixels, uint_fast16_t width, uint32_t length)
     memcpy(validPixels + offsetDest, pixels + offsetSrc, width);
 
     //round up to next index multiple of 4
-    offsetSrc += (offsetDest | 0x3) + 1;
+    offsetSrc += (width | 0x3) + 1;
   }
 
   return validPixels;
