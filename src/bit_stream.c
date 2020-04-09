@@ -38,7 +38,6 @@ bool BitStreamConvert(const uint8_t pixel, int numOccurrences,
   }
 
   //special code for zeros
-  numOccurrences--;
   *bitStream = ((numOccurrences - 18) / 2) | SPECIAL_CODE_MASK;
   *bitsUsed = (numOccurrences % 2 == 0) ? BITS_USED_SPECIAL_CODE : BITS_USED_SPECIAL_CODE + 1;
 
