@@ -20,13 +20,18 @@ int main(int argc, char *argv[])
   uint8_t *compressedImage = Compress(pixels, 5, 5, &size);
   if (!compressedImage)
   {
-    //printf("\nUnable to compress image\n");
+    printf("Unable to compress image\n");
     return -1;
   }
+
+  for (int i = 0; i < size; i++)
+  {
+    printf("%02X ", compressedImage[i]);
+  }
+
+  printf("\n");
 
   free(compressedImage);
 
   return 0;
 }
-
-

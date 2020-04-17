@@ -1,6 +1,7 @@
 // Copyright (C) 2020  Diogo Justen. All rights reserved.
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "bit_stream.h"
 
 #define BITS_USED_NON_ZERO 9
@@ -8,10 +9,41 @@
 #define SPECIAL_CODE_MASK 0x8000
 #define NON_ZERO_MASK 0x100
 
-/*
- * To discuss
- * Does not support to convert long sequence of 0's > (18 + 2 * 127). e.g. a black image.
- */
+int BitStreamAdd(uint8_t **vectorOutput, const uint8_t pixel, int numOccurrences)
+{
+  uint8_t bitsUsed;
+  uint32_t bitStream;
+
+  BitStreamConvert(pixel, numOccurrences, &bitStream, &bitsUsed);
+  BitStreamPrint(bitStream, bitsUsed);
+
+  //TODO move to struct
+  static uint8_t outputValue = 0;
+  static uint8_t outputBitSize = 0;
+  static int count = 0;
+
+  for (int i = bitsUsed - 1; i >= 0; i--)
+  {
+    if (outputBitSize == 0)
+    {
+      count++;
+      *vectorOutput = realloc(*vectorOutput, count);
+    }
+
+    uint8_t bit = (bitStream >> i) & 1U;
+    outputValue |= (bit << (7 - outputBitSize++));
+
+    (*vectorOutput)[count - 1] = outputValue;
+    if (outputBitSize == 8)
+    {
+      outputValue = 0;
+      outputBitSize = 0;
+    }
+  }
+
+  return count;
+}
+
 bool BitStreamConvert(const uint8_t pixel, int numOccurrences,
                       uint32_t *bitStream, uint8_t *bitsUsed)
 {

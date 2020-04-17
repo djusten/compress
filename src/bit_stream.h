@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+int BitStreamAdd(uint8_t **vectorOutput, const uint8_t pixel, int numOccurrences);
 bool BitStreamConvert(const uint8_t pixel, int numOccurrences,
                       uint32_t *bitStream, uint8_t *bitsUsed);
 void BitStreamPrint(uint32_t bitStream, uint8_t bitsUsed);

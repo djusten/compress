@@ -41,8 +41,7 @@ uint8_t *Compress(const uint8_t *pixels, uint_fast16_t width, uint_fast16_t heig
   printf("Valid pixels: ");
   printPixels(pixels, width, sizeTotal);
 
-  uint8_t bitsUsed;
-  uint32_t bitStream;
+  uint8_t *vectorOutput = NULL;
 
   for (int nextPixelIndex = 1; nextPixelIndex <= sizeTotal;)
   {
@@ -51,8 +50,7 @@ uint8_t *Compress(const uint8_t *pixels, uint_fast16_t width, uint_fast16_t heig
     //last valid pixel is different from previous
     if (nextPixelIndex >= sizeTotal)
     {
-      BitStreamConvert(*currentPixel, count, &bitStream, &bitsUsed);
-      BitStreamPrint(bitStream, bitsUsed);
+      *size = BitStreamAdd(&vectorOutput, *currentPixel, count);
       break;
     }
 
@@ -61,16 +59,14 @@ uint8_t *Compress(const uint8_t *pixels, uint_fast16_t width, uint_fast16_t heig
     {
       if (++count == MAX_ZERO_SPECIAL_CODE)
       {
-        BitStreamConvert(*currentPixel, count, &bitStream, &bitsUsed);
-        BitStreamPrint(bitStream, bitsUsed);
+        *size = BitStreamAdd(&vectorOutput, *currentPixel, count);
         currentPixelIndex = nextPixelIndex;
         count = 1;
       }
     }
     else
     {
-      BitStreamConvert(*currentPixel, count, &bitStream, &bitsUsed);
-      BitStreamPrint(bitStream, bitsUsed);
+      *size = BitStreamAdd(&vectorOutput, *currentPixel, count);
       currentPixelIndex = nextPixelIndex;
       count = 1;
     }
@@ -84,5 +80,5 @@ uint8_t *Compress(const uint8_t *pixels, uint_fast16_t width, uint_fast16_t heig
 
   printf("\n");
 
-  return NULL;
+  return vectorOutput;
 }
