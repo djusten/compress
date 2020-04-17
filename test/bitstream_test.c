@@ -7,7 +7,7 @@ void setUp(void) {
 void tearDown(void) {
 }
 
-void test_StreamConvert(void)
+void test_StreamConvert1Zero(void)
 {
   const uint8_t pixel = 0;
   int numOccurrences = 1;
@@ -24,7 +24,7 @@ int main(void)
 {
   UNITY_BEGIN();
 
-  RUN_TEST(test_StreamConvert);
+  RUN_TEST(test_StreamConvert1Zero);
 
   return UNITY_END();
 }

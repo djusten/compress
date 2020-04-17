@@ -31,7 +31,7 @@ void printPixels(const uint8_t *pixels, int width, int sizeTotal)
 uint8_t *Compress(const uint8_t *pixels, uint_fast16_t width, uint_fast16_t height, uint32_t *size)
 {
   int lineSize = (width | 0x3) + 1;
-  int sizeTotal = height * lineSize;
+  int sizeTotal = height == 1 ? width : (height * lineSize);
 
   int currentPixelIndex = 0;
   int currentLine = 0;

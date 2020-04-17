@@ -7,4 +7,4 @@ os:
 
 script:
   - mkdir build && cd build && cmake .. && make
-  - make test flag=-v
+  - ctest --verbose

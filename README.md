@@ -18,7 +18,8 @@ These instructions will get you a copy of the project up and running on your loc
 ### Building
 1. Clone the compress repository:
   ```bash
-  git clone https://github.com/djusten/compress.git
+  git clone --recursive https://github.com/djusten/compress.git
+  cd ./compress
   ```
 
 1. Create a build folder and compile:
@@ -26,10 +27,11 @@ These instructions will get you a copy of the project up and running on your loc
   mkdir build && cd build/
   cmake ..
   make
+  make test #To run unit tests
   ```
 
 ### Running
 1. To run the application:
   ```bash
-  ./compress_service
+  ./src/compress_service
   ```
