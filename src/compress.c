@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include "bit_stream.h"
+#include <bit_stream.h>
 
 #define MAX_ZERO_SPECIAL_CODE 272
 
