@@ -9,39 +9,35 @@
 #define SPECIAL_CODE_MASK 0x8000
 #define NON_ZERO_MASK 0x100
 
-int BitStreamAdd(uint8_t **vectorOutput, const uint8_t pixel, int numOccurrences)
+bool BitStreamAdd(BitStream *bitStream, const uint8_t pixel, int numOccurrences)
 {
   uint8_t bitsUsed;
-  uint32_t bitStream;
+  uint32_t pixelBitStream;
 
-  BitStreamConvert(pixel, numOccurrences, &bitStream, &bitsUsed);
-  BitStreamPrint(bitStream, bitsUsed);
+  BitStreamConvert(pixel, numOccurrences, &pixelBitStream, &bitsUsed);
+  BitStreamPrint(pixelBitStream, bitsUsed);
 
-  //TODO move to struct
-  static uint8_t outputValue = 0;
-  static uint8_t outputBitSize = 0;
-  static int count = 0;
-
+  //TODO use mask to shift using blocks
   for (int i = bitsUsed - 1; i >= 0; i--)
   {
-    if (outputBitSize == 0)
+    if (bitStream->outputBitSize == 0)
     {
-      count++;
-      *vectorOutput = realloc(*vectorOutput, count);
+      bitStream->size++;
+      bitStream->data = realloc(bitStream->data, bitStream->size);
     }
 
-    uint8_t bit = (bitStream >> i) & 1U;
-    outputValue |= (bit << (7 - outputBitSize++));
+    uint8_t bit = (pixelBitStream >> i) & 1U;
+    bitStream->outputValue |= (bit << (7 - bitStream->outputBitSize++));
 
-    (*vectorOutput)[count - 1] = outputValue;
-    if (outputBitSize == 8)
+    (bitStream->data)[bitStream->size - 1] = bitStream->outputValue;
+    if (bitStream->outputBitSize == 8)
     {
-      outputValue = 0;
-      outputBitSize = 0;
+      bitStream->outputValue = 0;
+      bitStream->outputBitSize = 0;
     }
   }
 
-  return count;
+  return true;
 }
 
 bool BitStreamConvert(const uint8_t pixel, int numOccurrences,
