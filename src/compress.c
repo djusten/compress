@@ -10,7 +10,7 @@
 void printPixels(const uint8_t *pixels, int width, int sizeTotal)
 {
   const uint8_t *p = pixels;
-  int lineSize = (width | 0x3) + 1;
+  int lineSize = width % 4 == 0 ? width : (width | 0x3) + 1;
   int currentLine = 0;
   int i;
 
@@ -20,7 +20,10 @@ void printPixels(const uint8_t *pixels, int width, int sizeTotal)
 
     if (++i >= (currentLine * lineSize) + width)
     {
-      i = (i | 0x3) + 1;
+      if (i % 4 != 0)
+      {
+        i = (i | 0x3) + 1;
+      }
       currentLine++;
     }
   }
@@ -30,7 +33,7 @@ void printPixels(const uint8_t *pixels, int width, int sizeTotal)
 
 uint8_t *Compress(const uint8_t *pixels, uint_fast16_t width, uint_fast16_t height, uint32_t *size)
 {
-  int lineSize = (width | 0x3) + 1;
+  int lineSize = width % 4 == 0 ? width : (width | 0x3) + 1;
   int sizeTotal = height == 1 ? width : (height * lineSize);
 
   int currentPixelIndex = 0;
@@ -49,38 +52,60 @@ uint8_t *Compress(const uint8_t *pixels, uint_fast16_t width, uint_fast16_t heig
     .outputBitSize = 0
   };
 
-  for (int nextPixelIndex = 1; nextPixelIndex <= sizeTotal;)
+  printf("Sizetotal: %d | lineSize: %d\n", sizeTotal, lineSize);
+  if (sizeTotal == 1)
   {
     const uint8_t *currentPixel = pixels + currentPixelIndex;
+    BitStreamAdd(&bitStream, *currentPixel, pixelCount);
+    *size = bitStream.size;
+    return bitStream.data;
+  }
 
-    //last valid pixel is different from previous
-    if (nextPixelIndex >= sizeTotal)
-    {
-      BitStreamAdd(&bitStream, *currentPixel, pixelCount);
-      break;
-    }
-
+  for (int nextPixelIndex = 1; nextPixelIndex < sizeTotal;)
+  {
+    const uint8_t *currentPixel = pixels + currentPixelIndex;
     const uint8_t *nextPixel = pixels + nextPixelIndex;
-    if (*currentPixel == *nextPixel)
+
+    if (*currentPixel != 0)
     {
-      if (++pixelCount == MAX_ZERO_SPECIAL_CODE)
+        BitStreamAdd(&bitStream, *currentPixel, pixelCount);
+        currentPixelIndex = nextPixelIndex;
+    }
+    else
+    {
+      if (*currentPixel == *nextPixel)
+      {
+        if (++pixelCount == MAX_ZERO_SPECIAL_CODE)
+        {
+          BitStreamAdd(&bitStream, *currentPixel, pixelCount);
+          currentPixelIndex = nextPixelIndex;
+          pixelCount = 1;
+        }
+      }
+      else
       {
         BitStreamAdd(&bitStream, *currentPixel, pixelCount);
         currentPixelIndex = nextPixelIndex;
         pixelCount = 1;
       }
     }
-    else
-    {
-      BitStreamAdd(&bitStream, *currentPixel, pixelCount);
-      currentPixelIndex = nextPixelIndex;
-      pixelCount = 1;
-    }
 
     if (++nextPixelIndex >= (currentLine * lineSize) + width)
     {
-      nextPixelIndex = (nextPixelIndex | 0x3) + 1;
+      // Next pixel already is multiple of 4
+      if (nextPixelIndex % 4 != 0)
+      {
+        nextPixelIndex = (nextPixelIndex | 0x3) + 1;
+      }
       currentLine++;
+    }
+
+    //last valid pixel is different from previous
+    if (nextPixelIndex >= sizeTotal)
+    {
+      currentPixel = pixels + currentPixelIndex;
+      BitStreamAdd(&bitStream, *currentPixel, pixelCount);
+      break;
     }
   }
 
