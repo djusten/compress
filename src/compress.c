@@ -20,6 +20,7 @@ void printPixels(const uint8_t *pixels, int width, int sizeTotal)
 
     if (++i >= (currentLine * lineSize) + width)
     {
+      // Next pixel already is multiple of 4
       if (i % 4 != 0)
       {
         i = (i | 0x3) + 1;
@@ -52,7 +53,6 @@ uint8_t *Compress(const uint8_t *pixels, uint_fast16_t width, uint_fast16_t heig
     .outputBitSize = 0
   };
 
-  printf("Sizetotal: %d | lineSize: %d\n", sizeTotal, lineSize);
   if (sizeTotal == 1)
   {
     const uint8_t *currentPixel = pixels + currentPixelIndex;
