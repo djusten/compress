@@ -11,10 +11,15 @@
 
 bool BitStreamAdd(BitStream *bitStream, const uint8_t pixel, int numOccurrences)
 {
-  uint8_t bitsUsed;
-  uint32_t pixelBitStream;
+  uint8_t bitsUsed = 0;
+  uint32_t pixelBitStream = 0;
 
-  BitStreamConvert(pixel, numOccurrences, &pixelBitStream, &bitsUsed);
+  if (!BitStreamConvert(pixel, numOccurrences, &pixelBitStream, &bitsUsed))
+  {
+    printf("Unable to convert bit stream");
+    return false;
+  }
+
   BitStreamPrint(pixelBitStream, bitsUsed);
 
   //TODO use mask to shift using blocks
@@ -47,6 +52,12 @@ bool BitStreamConvert(const uint8_t pixel, int numOccurrences,
 
   if (pixel != 0)
   {
+    if (numOccurrences > 1)
+    {
+      printf("Invalid pixel and numOccurrences\n");
+      return false;
+    }
+
     /*
      * "...input bytes (with values 1 to 255) shall be encoded by a BIT with the
      * value 1 followed by the eight bits of the input..."
